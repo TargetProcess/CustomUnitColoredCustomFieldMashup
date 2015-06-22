@@ -3,8 +3,16 @@ tau.mashups.addModule("CustomUnitColoredCustomField/config", [
         "name": "Favorite Fruit",
         "colors": {
             "Apple": "red",
-            "Pear": "green",
-            "Plum": "purple"
+            "Pear": "#00ff00",
+            "Plum": "rgb(128, 0, 128)"
+        }
+    },
+    {
+        "name": "Your Corps",
+        "colors": {
+            "Green Lanterns": "green",
+            "Red Lanterns": "#ff0000",
+            "Sinestro Corps": "rgb(255, 255, 0)"
         }
     }
 ]);
