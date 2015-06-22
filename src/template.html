@@ -1,6 +1,6 @@
 <div class="tau-board-unit__value">
     <span class="tau-entity-icon"
-        style="color: <%= fn.getColor(this.data.customValues) %>; background-color: <%= fn.getBackgroundColor(this.data.customValues) %>; text-transform: none;">
-        <%= fn.getValue(this.data.customValues) %>
+        style="color: <%= fn.getColor(this.data[fn.id]) %>; background-color: <%= fn.getBackgroundColor(this.data[fn.id]) %>; text-transform: none;">
+        <%= fn.getValue(this.data[fn.id]) %>
     </span>
 </div>

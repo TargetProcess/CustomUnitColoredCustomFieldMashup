@@ -9,53 +9,33 @@ import $ from 'jquery';
 const config = mashup.config;
 const cu = targetprocessHelper.customUnits;
 
-import template from 'raw!./template.html';
+import types from 'tau/models/board.customize.units/const.customField.types';
 
-const getColor = (cfConfig, customValues) => {
+import {openUnitEditor} from 'tau/models/board.customize.units/board.customize.units.interaction';
 
-    const field = _.findWhere(customValues.customFields, {
+const getEditor = (customField) => {
 
-        name: cfConfig.name
+    const typeName = {
+        [types.TEXT]: 'text',
+        [types.NUMBER]: 'number',
+        [types.MONEY]: 'money',
+        [types.DATE]: 'date',
+        [types.DROP_DOWN]: 'dropdown'
+    }[customField.type.toLowerCase()];
 
-    });
-    var color;
-
-    if (field) {
-
-        color = cfConfig.colors[field.value];
-
-    }
-
-    return color;
+    return typeName ? `customField.${typeName}.editor` : null;
 
 };
 
-const getValue = (cfConfig, customValues) => {
+import template from './template.html';
 
-    const field = _.findWhere(customValues.customFields, {
+const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value]) : null;
 
-        name: cfConfig.name
-
-    });
-    var value;
-
-    if (field) {
-
-        value = field.value;
-
-    }
-
-    return value;
-
-};
+const getValue = (field) => field ? field.value : '';
 
 const hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
-const hex = (x) => {
-
-    return isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
-
-};
+const hex = (x) => isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
 
 const rgb2hex = (rgb) => {
 
@@ -72,7 +52,7 @@ const opacify = (col, a) => {
 
     }
 
-    if (!col.match(/^[0-9a-f]+$/i)) {
+    if (!col.match(/^[0-9a-f]{6}$/i)) {
 
         const rgb = $('<span />').css('color', col).css('color');
 
@@ -96,43 +76,58 @@ const opacify = (col, a) => {
 config.forEach((cf) => {
 
     const name = cf.name;
+    const id = `colored_custom_field_${_.underscored(name)}`;
 
     cu.add({
         name: name,
-        id: `colored_custom_field_${_.underscored(name)}`,
-        hideIf: (data) => {
-
-            return !getValue(cf, data.customValues);
-
-        },
+        id: id,
+        classId: 'tau-board-unit_type_custom_field_100',
+        hideIf: (data) => !getValue(data[id]),
         template: {
             markup: [template],
             customFunctions: {
-                getColor: getColor.bind(null, cf),
+                id: id,
+                getColor: (val) => val ? getColor(cf, val) : '#000000',
                 getBackgroundColor: (val) => {
 
                     const color = getColor(cf, val);
 
                     if (!color) {
 
-                        return '';
+                        return '#ebebeb';
 
                     }
                     return opacify(color, 0.3);
 
                 },
-                getValue: getValue.bind(null, cf)
+                getValue: getValue
             }
         },
         sampleData: {
-            customValues: {
-                customFields: [{
-                    name: 'Favorite Fruit',
-                    value: 'Apple'
-                }]
+            [id]: {
+                value: _.keys(cf.colors)[0] || 'Value'
             }
         },
-        model: 'customValues:CustomValues'
+        model: `${id}:CustomValues.Get("${name}")`,
+        interactionConfig: {
+            isEditable: function(scope) {
+
+                var customField = scope.data[id];
+
+                return customField && customField.type && !customField.calculationModel && getEditor(customField);
+
+            },
+            handler: function(data, environment) {
+
+                var customField = data.cardDataForUnit[id];
+                var editor = openUnitEditor(getEditor(customField), {});
+
+                data.cardDataForUnit.cf = data.cardDataForUnit[id];
+
+                return editor(data, environment);
+
+            }
+        }
     });
 
 });
