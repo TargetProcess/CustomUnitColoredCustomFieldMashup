@@ -29,7 +29,7 @@ const getEditor = (customField) => {
 
 import template from './template.html';
 
-const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value]) : null;
+const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value] || null) : null;
 
 const getValue = (field) => field ? field.value : '';
 
@@ -81,23 +81,17 @@ config.forEach((cf) => {
     cu.add({
         name: name,
         id: id,
-        classId: 'tau-board-unit_type_custom_field_100',
         hideIf: (data) => !getValue(data[id]),
         template: {
             markup: [template],
             customFunctions: {
                 id: id,
-                getColor: (val) => val ? getColor(cf, val) : '#000000',
+                getColor: (val) => getColor(cf, val),
                 getBackgroundColor: (val) => {
 
                     const color = getColor(cf, val);
 
-                    if (!color) {
-
-                        return '#ebebeb';
-
-                    }
-                    return opacify(color, 0.3);
+                    return color ? opacify(color, 0.3) : 'transparent';
 
                 },
                 getValue: getValue
