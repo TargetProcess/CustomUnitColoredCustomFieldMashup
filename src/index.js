@@ -2,7 +2,7 @@
 /*eslint no-bitwise:0*/
 'use strict';
 
-import targetprocessHelper from 'targetprocess-mashup-helper';
+import targetprocessHelper from './targetprocess-mashup-helper';
 import _ from 'underscore';
 import $ from 'jquery';
 
