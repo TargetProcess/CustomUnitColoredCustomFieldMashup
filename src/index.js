@@ -2,12 +2,11 @@
 /*eslint no-bitwise:0*/
 'use strict';
 
-import targetprocessHelper from './targetprocess-mashup-helper';
+import cu from 'targetprocess-mashup-helper/lib/customUnits';
 import _ from 'underscore';
 import $ from 'jquery';
 
 const config = mashup.config;
-const cu = targetprocessHelper.customUnits;
 
 import types from 'tau/models/board.customize.units/const.customField.types';
 
@@ -83,7 +82,7 @@ config.forEach((cf) => {
         id: id,
         hideIf: (data) => !getValue(data[id]),
         template: {
-            markup: [template],
+            markup: template,
             customFunctions: {
                 id: id,
                 getColor: (val) => getColor(cf, val),
@@ -102,7 +101,9 @@ config.forEach((cf) => {
                 value: _.keys(cf.colors)[0] || 'Value'
             }
         },
-        model: `${id}:CustomValues.Get("${name}")`,
+        model: {
+            [id]: `CustomValues.Get("${name}")`
+        },
         interactionConfig: {
             isEditable: function(scope) {
 
