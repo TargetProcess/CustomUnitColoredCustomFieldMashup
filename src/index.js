@@ -8,21 +8,14 @@ import $ from 'jquery';
 
 const config = mashup.config;
 
-import types from 'tau/models/board.customize.units/const.customField.types';
-
 import {openUnitEditor} from 'tau/models/board.customize.units/board.customize.units.interaction';
 
 const getEditor = (customField) => {
 
-    const typeName = {
-        [types.TEXT]: 'text',
-        [types.NUMBER]: 'number',
-        [types.MONEY]: 'money',
-        [types.DATE]: 'date',
-        [types.DROP_DOWN]: 'dropdown'
-    }[customField.type.toLowerCase()];
+    const typeName = customField.type.toLowerCase();
+    const typeNames = ['text', 'number', 'money', 'date', 'dropdown'];
 
-    return typeName ? `customField.${typeName}.editor` : null;
+    return (typeNames.indexOf(typeName) >= 0) ? `customField.${typeName}.editor` : null;
 
 };
 
