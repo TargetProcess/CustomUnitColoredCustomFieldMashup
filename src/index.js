@@ -31,8 +31,15 @@ const hex = (x) => isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x 
 
 const rgb2hex = (rgb) => {
 
-    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    const comps = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+    if (comps && comps.length) {
+
+        return hex(comps[1]) + hex(comps[2]) + hex(comps[3]);
+
+    }
+
+    return null;
 
 };
 
@@ -48,20 +55,28 @@ const opacify = (col, a) => {
 
         const rgb = $('<span />').css('color', col).css('color');
 
-        col = rgb2hex(rgb);
+        const normalizedColor = rgb2hex(rgb);
+
+        if (normalizedColor) {
+
+            const color = parseInt(normalizedColor, 16);
+            const r = color >> 16;
+            const g = ((color >> 8) & 0x00FF);
+            const b = (color & 0x0000FF);
+
+            const tr = (1 - a) + r / 255 * a;
+            const tg = (1 - a) + g / 255 * a;
+            const tb = (1 - a) + b / 255 * a;
+
+            return 'rgb(' + [Math.ceil(tr * 255), Math.ceil(tg * 255), Math.ceil(tb * 255)].join(', ') + ')';
+
+        } else {
+
+            return 'transparent';
+
+        }
 
     }
-
-    const color = parseInt(col, 16);
-    const r = color >> 16;
-    const g = ((color >> 8) & 0x00FF);
-    const b = (color & 0x0000FF);
-
-    const tr = (1 - a) + r / 255 * a;
-    const tg = (1 - a) + g / 255 * a;
-    const tb = (1 - a) + b / 255 * a;
-
-    return 'rgb(' + [Math.ceil(tr * 255), Math.ceil(tg * 255), Math.ceil(tb * 255)].join(', ') + ')';
 
 };
 
