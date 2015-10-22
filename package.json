@@ -9,7 +9,7 @@
   ],
   "author": "Aliaksei Shytkin <shitkin@targetprocess.com>",
   "scripts": {
-    "build": "webpack --output-path $TARGETPROCESS_MASHUPS_PATH/CustomUnitColoredCustomField --watch",
+    "start": "webpack --output-path $TARGETPROCESS_MASHUPS_PATH/CustomUnitColoredCustomField --watch",
     "build-production": "rm -rf dist && webpack --output-path dist --config webpack-production.config.js",
     "build-library": "rm -rf library && webpack --output-path library --config webpack-library.config.js && cp src/README.mkd library"
   },
