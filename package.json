@@ -31,14 +31,13 @@
     "raw-loader": "^0.5.1",
     "style-loader": "^0.12.3",
     "targetprocess-mashup-config-loader": "github:targetprocess/targetprocess-mashup-config-loader",
-    "targetprocess-mashup-helper": "^0.1.0",
+    "targetprocess-mashup-helper": "^0.4.0",
     "targetprocess-mashup-manifest-loader": "github:targetprocess/targetprocess-mashup-manifest-loader",
     "targetprocess-mashup-webpack-plugin": "github:targetprocess/targetprocess-mashup-webpack-plugin",
     "webpack": "^1.9.10"
   },
   "main": "make-webpack-config.js",
-  "dependencies": {
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TargetProcess/CustomUnitColoredCustomFieldMashup.git"
