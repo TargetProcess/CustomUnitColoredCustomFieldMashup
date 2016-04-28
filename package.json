@@ -30,7 +30,7 @@
     "lodash": "^3.9.3",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.12.3",
-    "targetprocess-mashup-config-loader": "github:targetprocess/targetprocess-mashup-config-loader",
+    "targetprocess-mashup-config-loader": "^1.0.0",
     "targetprocess-mashup-helper": "^0.4.0",
     "targetprocess-mashup-manifest-loader": "github:targetprocess/targetprocess-mashup-manifest-loader",
     "targetprocess-mashup-webpack-plugin": "github:targetprocess/targetprocess-mashup-webpack-plugin",

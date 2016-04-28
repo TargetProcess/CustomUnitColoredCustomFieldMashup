@@ -27,7 +27,7 @@ var makeWebpackConfig = function(opts) {
 
     config.entry = {
         // process config js module from JSON file
-        configData: ['targetprocess-mashup-config?libraryTarget=' + mashupName
+        configData: ['targetprocess-mashup-config?parse=false&libraryTarget=' + mashupName
             + '&outputFile=' + outputConfigFileName + '!./src/config.json'],
         // main entry point
         index: ['./src/index.js']
