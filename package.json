@@ -10,8 +10,12 @@
   "author": "Aliaksei Shytkin <shitkin@targetprocess.com>",
   "scripts": {
     "start": "webpack --output-path $TARGETPROCESS_MASHUPS_PATH/CustomUnitColoredCustomField --watch",
-    "build-production": "rm -rf dist && webpack --output-path dist --config webpack-production.config.js",
-    "build-library": "rm -rf library && webpack --output-path library --config webpack-library.config.js && cp src/README.mkd library"
+    "build-production": "rm -rf build/manager && webpack --output-path build/manager --config webpack-production.config.js",
+    "build-library": "rm -rf build/library && webpack --output-path build/library --config webpack-library.config.js && cp src/README.mkd build/library",
+    "build:all": "npm run build-library && npm run build-production",
+    "version": "npm run build:all && git add -A build",
+    "postversion": "git push && git push --tags"
+
   },
   "licenses": [
     {
