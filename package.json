@@ -1,6 +1,6 @@
 {
   "name": "CustomUnitColoredCustomField",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Webpack boilerplate to create Targetprocess mashup.",
   "keywords": [
     "webpack",
@@ -15,7 +15,6 @@
     "build:all": "npm run build-library && npm run build-production",
     "version": "npm run build:all && git add -A build",
     "postversion": "git push && git push --tags"
-
   },
   "licenses": [
     {
