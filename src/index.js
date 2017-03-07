@@ -1,5 +1,4 @@
 /*globals mashup*/
-/*eslint no-bitwise:0*/
 'use strict';
 
 import customUnits from 'targetprocess-mashup-helper/lib/customUnits';
@@ -21,52 +20,50 @@ const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value] || n
 
 const getValue = (field) => field ? field.value : '';
 
-const hex = (x) => {
-    if (isNaN(x) || x < 0) {
-        return '00';
-    }
-
-    if (x > 255) {
-        return 'ff';
-    }
-
-    return (x < 16) ? ('0' + x.toString(16)) : x.toString(16);
-};
-
-const rgb2hex = (rgb) => {
-    const comps = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    if (comps && comps.length) {
-        return hex(comps[1]) + hex(comps[2]) + hex(comps[3]);
+/**
+ * @param {String} color
+ * @param {RegExp} pattern
+ * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
+ */
+const tryParseRGB = (color, pattern) => {
+    const match = color.match(pattern);
+    if (match && match.length) {
+        return {r: parseInt(match[1], 16), g: parseInt(match[2], 16), b: parseInt(match[3], 16)};
     }
     return null;
 };
 
-const opacify = (col, a) => {
-    if (col[0] === '#') {
-        col = col.slice(1);
+/**
+ * @param {String} color
+ * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
+ */
+const normalizeColor = (color) => {
+    if (color[0] === '#') {
+        color = color.slice(1);
     }
 
-    if (!col.match(/^[0-9a-f]{6}$/i)) {
-        const rgb = $('<span />').css('color', col).css('color');
-        const normalizedColor = rgb2hex(rgb);
-
-        if (normalizedColor) {
-            const color = parseInt(normalizedColor, 16);
-            const r = color >> 16;
-            const g = ((color >> 8) & 0x00FF);
-            const b = (color & 0x0000FF);
-
-            const tr = (1 - a) + r / 255 * a;
-            const tg = (1 - a) + g / 255 * a;
-            const tb = (1 - a) + b / 255 * a;
-
-            return 'rgb(' + [Math.ceil(tr * 255), Math.ceil(tg * 255), Math.ceil(tb * 255)].join(', ') + ')';
-        } else {
-            return 'transparent';
-        }
+    const rgb = tryParseRGB(color, /^([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+    if (rgb) {
+        return rgb;
     }
 
-    return 'transparent';
+    color = $('<span />').css('color', color).css('color');
+    return tryParseRGB(color, /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/) ||
+        tryParseRGB(color, /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/);
+};
+
+const opacify = (color, opacity) => {
+    const normalizedColor = normalizeColor(color);
+    if (!normalizedColor) {
+        return 'transparent';
+    }
+
+    const base = 255 * (1 - opacity);
+    const r = base + normalizedColor.r * opacity;
+    const g = base + normalizedColor.g * opacity;
+    const b = base + normalizedColor.b * opacity;
+
+    return `rgb(${Math.ceil(r)}, ${Math.ceil(g)}, ${Math.ceil(b)})`;
 };
 
 config.forEach((cf) => {
@@ -82,7 +79,7 @@ config.forEach((cf) => {
             markup: template,
             customFunctions: {
                 id: id,
-                getColor: (val) => getColor(cf, val),
+                getColor: (val) => getColor(cf, val) || 'inherit',
                 getBackgroundColor: (val) => {
                     const color = getColor(cf, val);
                     return color ? opacify(color, 0.3) : 'transparent';
@@ -103,13 +100,13 @@ config.forEach((cf) => {
 
         interactionConfig: {
             isEditable: function(scope) {
-                var customField = scope.data[id];
+                const customField = scope.data[id];
                 return customField && customField.type && !customField.calculationModel && getEditor(customField);
             },
 
             handler: function(data, environment) {
-                var customField = data.cardDataForUnit[id];
-                var editor = openUnitEditor(getEditor(customField), {});
+                const customField = data.cardDataForUnit[id];
+                const editor = openUnitEditor(getEditor(customField), {});
                 data.cardDataForUnit.cf = data.cardDataForUnit[id];
                 return editor(data, environment);
             }
