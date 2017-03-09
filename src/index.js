@@ -10,34 +10,41 @@ import template from './template.html';
 
 const config = mashup.config;
 
-const getEditor = (customField) => {
-    const typeName = customField.type.toLowerCase();
-    const typeNames = ['text', 'number', 'money', 'date', 'dropdown'];
-    return (typeNames.indexOf(typeName) >= 0) ? `customField.${typeName}.editor` : null;
+const cfEditors = {
+    'text': `customField.text.editor`,
+    'number': `customField.number.editor`,
+    'money': `customField.money.editor`,
+    'date': `customField.date.editor`,
+    'dropdown': `customField.dropdown.editor`
 };
 
-const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value] || null) : null;
+function getEditor(customField) {
+    const typeName = customField.type.toLowerCase();
+    return cfEditors[typeName] || null;
+}
 
-const getValue = (field) => field ? field.value : '';
+function getValue(field) {
+    return field ? field.value : '';
+}
 
 /**
  * @param {String} color
  * @param {RegExp} pattern
  * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
  */
-const tryParseRGB = (color, pattern) => {
+function tryParseRGB(color, pattern) {
     const match = color.match(pattern);
     if (match && match.length) {
         return {r: parseInt(match[1], 16), g: parseInt(match[2], 16), b: parseInt(match[3], 16)};
     }
     return null;
-};
+}
 
 /**
  * @param {String} color
  * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
  */
-const normalizeColor = (color) => {
+function normalizeColor(color) {
     if (color[0] === '#') {
         color = color.slice(1);
     }
@@ -50,9 +57,9 @@ const normalizeColor = (color) => {
     color = $('<span />').css('color', color).css('color');
     return tryParseRGB(color, /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/) ||
         tryParseRGB(color, /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/);
-};
+}
 
-const opacify = (color, opacity) => {
+function opacify(color, opacity) {
     const normalizedColor = normalizeColor(color);
     if (!normalizedColor) {
         return 'transparent';
@@ -64,12 +71,32 @@ const opacify = (color, opacity) => {
     const b = base + normalizedColor.b * opacity;
 
     return `rgb(${Math.ceil(r)}, ${Math.ceil(g)}, ${Math.ceil(b)})`;
-};
+}
+
+function getTextColor(config) {
+    return typeof config === 'string' ? config : (config && config.text);
+}
+
+function getColor(cfConfig, field) {
+    const config = field && cfConfig.colors[field.value];
+    return getTextColor(config) || 'inherit';
+}
+
+function getBackgroundColor(cfConfig, field) {
+    const config = field && cfConfig.colors[field.value];
+    if (config && config.background) {
+        return config.background;
+    }
+
+    const textColor = getTextColor(config);
+    return textColor ? opacify(textColor, 0.3) : 'transparent';
+}
 
 config.forEach((cf) => {
     const name = cf.name;
     const id = `colored_custom_field_${_.underscored(name)}`;
 
+    //noinspection JSUnusedGlobalSymbols
     customUnits.add({
         name: name,
         id: id,
@@ -79,11 +106,8 @@ config.forEach((cf) => {
             markup: template,
             customFunctions: {
                 id: id,
-                getColor: (val) => getColor(cf, val) || 'inherit',
-                getBackgroundColor: (val) => {
-                    const color = getColor(cf, val);
-                    return color ? opacify(color, 0.3) : 'transparent';
-                },
+                getColor: (field) => getColor(cf, field) || 'inherit',
+                getBackgroundColor: (field) => getBackgroundColor(cf, field),
                 getValue: getValue
             }
         },

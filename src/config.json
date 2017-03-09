@@ -5,7 +5,8 @@
     //        "Apple": "red",
     //        "Pear": "#007f00",
     //        "Plum": "rgb(128, 0, 128)",
-    //        "Tangerine": "orange"
+    //        "Tangerine": "orange",
+    //        "Lemon": {text: "black", background: "rgb(358, 358, 179)"}
     //    }
     //},
     //{
