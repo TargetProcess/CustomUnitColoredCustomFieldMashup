@@ -1,136 +1,139 @@
 /*globals mashup*/
-/*eslint no-bitwise:0*/
 'use strict';
 
-import cu from 'targetprocess-mashup-helper/lib/customUnits';
+import customUnits from 'targetprocess-mashup-helper/lib/customUnits';
 import _ from 'underscore';
 import $ from 'jquery';
 
-const config = mashup.config;
-
 import {openUnitEditor} from 'tau/models/board.customize.units/board.customize.units.interaction';
-
-const getEditor = (customField) => {
-
-    const typeName = customField.type.toLowerCase();
-    const typeNames = ['text', 'number', 'money', 'date', 'dropdown'];
-
-    return (typeNames.indexOf(typeName) >= 0) ? `customField.${typeName}.editor` : null;
-
-};
-
 import template from './template.html';
 
-const getColor = (cfConfig, field) => field ? (cfConfig.colors[field.value] || null) : null;
+const config = mashup.config;
 
-const getValue = (field) => field ? field.value : '';
+const cfEditors = {
+    'text': `customField.text.editor`,
+    'number': `customField.number.editor`,
+    'money': `customField.money.editor`,
+    'date': `customField.date.editor`,
+    'dropdown': `customField.dropdown.editor`
+};
 
-const hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+function getEditor(customField) {
+    const typeName = customField.type.toLowerCase();
+    return cfEditors[typeName] || null;
+}
 
-const hex = (x) => isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+function getValue(field) {
+    return field ? field.value : '';
+}
 
-const rgb2hex = (rgb) => {
-
-    const comps = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-
-    if (comps && comps.length) {
-
-        return hex(comps[1]) + hex(comps[2]) + hex(comps[3]);
-
+/**
+ * @param {String} color
+ * @param {RegExp} pattern
+ * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
+ */
+function tryParseRGB(color, pattern) {
+    const match = color.match(pattern);
+    if (match && match.length) {
+        return {r: parseInt(match[1], 16), g: parseInt(match[2], 16), b: parseInt(match[3], 16)};
     }
-
     return null;
+}
 
-};
-
-const opacify = (col, a) => {
-
-    if (col[0] === '#') {
-
-        col = col.slice(1);
-
+/**
+ * @param {String} color
+ * @returns {{r: Number, g: Number, b: Number}|null} hex color components or null
+ */
+function normalizeColor(color) {
+    if (color[0] === '#') {
+        color = color.slice(1);
     }
 
-    if (!col.match(/^[0-9a-f]{6}$/i)) {
-
-        const rgb = $('<span />').css('color', col).css('color');
-
-        const normalizedColor = rgb2hex(rgb);
-
-        if (normalizedColor) {
-
-            const color = parseInt(normalizedColor, 16);
-            const r = color >> 16;
-            const g = ((color >> 8) & 0x00FF);
-            const b = (color & 0x0000FF);
-
-            const tr = (1 - a) + r / 255 * a;
-            const tg = (1 - a) + g / 255 * a;
-            const tb = (1 - a) + b / 255 * a;
-
-            return 'rgb(' + [Math.ceil(tr * 255), Math.ceil(tg * 255), Math.ceil(tb * 255)].join(', ') + ')';
-
-        } else {
-
-            return 'transparent';
-
-        }
-
+    const rgb = tryParseRGB(color, /^([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i);
+    if (rgb) {
+        return rgb;
     }
 
-};
+    color = $('<span />').css('color', color).css('color');
+    return tryParseRGB(color, /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/) ||
+        tryParseRGB(color, /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/);
+}
+
+function opacify(color, opacity) {
+    const normalizedColor = normalizeColor(color);
+    if (!normalizedColor) {
+        return 'transparent';
+    }
+
+    const base = 255 * (1 - opacity);
+    const r = base + normalizedColor.r * opacity;
+    const g = base + normalizedColor.g * opacity;
+    const b = base + normalizedColor.b * opacity;
+
+    return `rgb(${Math.ceil(r)}, ${Math.ceil(g)}, ${Math.ceil(b)})`;
+}
+
+function getTextColor(config) {
+    return typeof config === 'string' ? config : (config && config.text);
+}
+
+function getColor(cfConfig, field) {
+    const config = field && cfConfig.colors[field.value];
+    return getTextColor(config) || 'inherit';
+}
+
+function getBackgroundColor(cfConfig, field) {
+    const config = field && cfConfig.colors[field.value];
+    if (config && config.background) {
+        return config.background;
+    }
+
+    const textColor = getTextColor(config);
+    return textColor ? opacify(textColor, 0.3) : 'transparent';
+}
 
 config.forEach((cf) => {
-
     const name = cf.name;
     const id = `colored_custom_field_${_.underscored(name)}`;
 
-    cu.add({
+    //noinspection JSUnusedGlobalSymbols
+    customUnits.add({
         name: name,
         id: id,
         hideIf: (data) => !getValue(data[id]),
+
         template: {
             markup: template,
             customFunctions: {
                 id: id,
-                getColor: (val) => getColor(cf, val),
-                getBackgroundColor: (val) => {
-
-                    const color = getColor(cf, val);
-
-                    return color ? opacify(color, 0.3) : 'transparent';
-
-                },
+                getColor: (field) => getColor(cf, field) || 'inherit',
+                getBackgroundColor: (field) => getBackgroundColor(cf, field),
                 getValue: getValue
             }
         },
+
         sampleData: {
             [id]: {
                 value: _.keys(cf.colors)[0] || 'Value'
             }
         },
+
         model: {
             [id]: `CustomValues.Get("${name}")`
         },
+
         interactionConfig: {
             isEditable: function(scope) {
-
-                var customField = scope.data[id];
-
+                const customField = scope.data[id];
                 return customField && customField.type && !customField.calculationModel && getEditor(customField);
-
             },
+
             handler: function(data, environment) {
-
-                var customField = data.cardDataForUnit[id];
-                var editor = openUnitEditor(getEditor(customField), {});
-
+                const customField = data.cardDataForUnit[id];
+                const editor = openUnitEditor(getEditor(customField), {});
                 data.cardDataForUnit.cf = data.cardDataForUnit[id];
-
                 return editor(data, environment);
-
             }
         }
     });
-
 });
