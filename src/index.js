@@ -97,7 +97,7 @@ config.forEach((cf) => {
     const id = `colored_custom_field_${_.underscored(name)}`;
 
     //noinspection JSUnusedGlobalSymbols
-    customUnits.add({
+    const unit = {
         name: name,
         id: id,
         hideIf: (data) => !getValue(data[id]),
@@ -135,5 +135,12 @@ config.forEach((cf) => {
                 return editor(data, environment);
             }
         }
-    });
+    };
+
+    if (cf.sortable !== false) {
+        unit.category = 'simple';
+        unit.sortConfig = {field: cf.name};
+    }
+
+    customUnits.add(unit);
 });
