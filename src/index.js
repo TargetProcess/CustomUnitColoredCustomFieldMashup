@@ -24,7 +24,23 @@ function getEditor(customField) {
 }
 
 function getValue(field) {
-    return field ? field.value : '';
+    if (!field) {
+        return '';
+    }
+
+    if (!_.isObject(field.value)) {
+        return field.value;
+    }
+
+    if (field.value.uri) {
+        return field.value.uri;
+    }
+
+    if (field.value.id) {
+        return field.value.id;
+    }
+
+    return field.value;
 }
 
 /**
@@ -78,12 +94,12 @@ function getTextColor(config) {
 }
 
 function getColor(cfConfig, field) {
-    const config = field && cfConfig.colors[field.value];
+    const config = field && cfConfig.colors[getValue(field)];
     return getTextColor(config) || 'inherit';
 }
 
 function getBackgroundColor(cfConfig, field) {
-    const config = field && cfConfig.colors[field.value];
+    const config = field && cfConfig.colors[getValue(field)];
     if (config && config.background) {
         return config.background;
     }
@@ -120,6 +136,16 @@ config.forEach((cf) => {
 
         model: {
             [id]: `CustomValues.Get("${name}")`
+        },
+
+        csv: {
+            columns: [
+                {
+                    id: id,
+                    name: name,
+                    model: 'cf:CustomValues.Get("' + name  + '").Value'
+                }
+            ]
         },
 
         interactionConfig: {
