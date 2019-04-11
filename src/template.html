@@ -1,6 +1,8 @@
 <div class="tau-board-unit__value" style="display: -ms-flex; display: -webkit-flex; display: flex;">
-    <div class="tau-entity-icon"
-        style="color: <%= fn.getColor(this.data[fn.id]) %>; background-color: <%= fn.getBackgroundColor(this.data[fn.id]) %>; text-transform: none; -ms-flex: 1 1 auto; -webkit-flex: 1 1 auto; flex: 1 1 auto; text-align: left;">
-        <%= fn.getValue(this.data[fn.id]) %>
+    <div class="tau-board-unit__icon-entity-wrapper">
+        <div class="tau-entity-icon"
+            style="color: <%= fn.getColor(this.data[fn.id]) %>; background-color: <%= fn.getBackgroundColor(this.data[fn.id]) %>; text-transform: none; -ms-flex: 1 1 auto; -webkit-flex: 1 1 auto; flex: 1 1 auto; text-align: left;">
+            <%= fn.getValue(this.data[fn.id]) %>
+        </div>
     </div>
 </div>
