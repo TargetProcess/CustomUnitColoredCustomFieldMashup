@@ -1,6 +1,6 @@
 {
   "name": "CustomUnitColoredCustomField",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "The mashup adds a new custom unit to the Customize Cards tab in a View Setup area, based on a custom field that needs to be specified in the mashup code. The values of that custom field are mapped to colors in the mashup code, which will the be used to color the values on the cards.",
   "keywords": [
     "webpack",
@@ -34,14 +34,12 @@
     "shelljs": "^0.7.6",
     "shx": "^0.2.2",
     "style-loader": "^0.13.0",
-    "targetprocess-mashup-helper": "^0.4.0",
+    "targetprocess-mashup-helper": "^1.0.3",
     "targetprocess-mashup-webpack-plugin": "^1.0.0",
     "tmp": "0.0.28",
     "webpack": "^1.12.12"
   },
-  "dependencies": {
-    "targetprocess-mashup-helper": "^0.4.0"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TargetProcess/CustomUnitColoredCustomFieldMashup.git"
