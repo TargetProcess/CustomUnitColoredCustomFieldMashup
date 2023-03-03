@@ -37,7 +37,7 @@
     "targetprocess-mashup-helper": "^1.0.3",
     "targetprocess-mashup-webpack-plugin": "^1.0.0",
     "tmp": "0.0.28",
-    "webpack": "^1.12.12"
+    "webpack": "^5.75.0"
   },
   "dependencies": {},
   "repository": {
