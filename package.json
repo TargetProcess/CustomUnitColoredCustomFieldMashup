@@ -22,14 +22,14 @@
     "autoprefixer": "^6.3.1",
     "babel-core": "^6.23.1",
     "babel-eslint": "^6.1.2",
-    "babel-loader": "^6.2.2",
+    "babel-loader": "^9.1.2",
     "babel-preset-es2015": "^6.3.13",
     "cross-env": "^3.1.4",
-    "css-loader": "^0.23.1",
+    "css-loader": "^6.7.3",
     "eslint": "3.7.0",
-    "file-loader": "^0.8.5",
-    "html-loader": "^0.3.0",
-    "postcss-loader": "^0.8.0",
+    "file-loader": "^6.2.0",
+    "html-loader": "^4.2.0",
+    "postcss-loader": "^7.2.4",
     "raw-loader": "^0.5.1",
     "shelljs": "^0.7.6",
     "shx": "^0.2.2",
@@ -37,7 +37,7 @@
     "targetprocess-mashup-helper": "^1.0.3",
     "targetprocess-mashup-webpack-plugin": "^1.0.0",
     "tmp": "0.0.28",
-    "webpack": "^1.12.12"
+    "webpack": "^5.79.0"
   },
   "dependencies": {},
   "repository": {
